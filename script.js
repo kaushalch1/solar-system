@@ -7,6 +7,9 @@ import mercuryTexture from '../three.j/img/mercury.jpg';
 import venusTexture from '../three.j/img/venus.jpg';
 import earthTexture from '../three.j/img/earth.jpg';
 import marsTexture from '../three.j/img/mars.jpg';
+import jupiterTexture from '../three.j/img/jupiter.jpg';
+import { PointerLockControls } from 'three/examples/jsm/Addons.js';
+//import { createElement } from 'react';
 
 const renderer= new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth,window.innerHeight);
@@ -48,46 +51,73 @@ const sunMat= new THREE.MeshBasicMaterial({
 });
 const sun=new THREE.Mesh(sungeo,sunMat);
 scene.add(sun);
+sun.name = 'sun';
+function createplanet(radius, texture, dist, name){
+    const geo = new THREE.SphereGeometry(radius,30,30);
+    const mat = new THREE.MeshStandardMaterial({
+        map: textureLoader.load(texture)
+    });
+    const planet = new THREE.Mesh(geo, mat);
+    if (name) planet.name = name;
+    const planetobj = new THREE.Object3D();
+    planetobj.add(planet);
+    scene.add(planetobj);
+    planet.position.x = dist;
+    return {planet,planetobj};
+}
+const mercury = createplanet(3.2, mercuryTexture, 28, 'mercury');
+const venus =createplanet(5.8,venusTexture,42,'venus');
+const earth =createplanet(6,earthTexture,62,'earth');
+const mars =createplanet(4,marsTexture,78,'mars');
+const jupiter =createplanet(12,jupiterTexture,100,'jupiter');
 
-const mercurygeo=new THREE.SphereGeometry(3.2,30,30);
-const mercuryMat=new THREE.MeshStandardMaterial({
-    map:textureLoader.load(mercuryTexture)
-});
-const mercury=new THREE.Mesh(mercurygeo,mercuryMat);
-const mercuryobj=new THREE.Object3D();
-mercuryobj.add(mercury);
-scene.add(mercuryobj);
-//sun.add(mercury);
-mercury.position.x=28;
-mercuryobj.addEventListener('click',()=>{
-    console.log('mercury');
-})
-const venusgeo=new THREE.SphereGeometry(5.8,30,30);
-const venusMat=new THREE.MeshStandardMaterial({
-    map:textureLoader.load(venusTexture)
-});
-const venus= new THREE.Mesh(venusgeo,venusMat);
-sun.add(venus);
-venus.position.x=42;
+const clickableMeshes = [sun, mercury.planet, venus.planet, earth.planet, mars.planet, jupiter.planet];
 
-const earthgeo=new THREE.SphereGeometry(6,30,30);
-const earthMat=new THREE.MeshStandardMaterial({
-    map:textureLoader.load(earthTexture)
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+renderer.domElement.addEventListener('pointerdown', (event) => {
+    const rect = renderer.domElement.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    raycaster.style.cursor="pointer";
+    const hits = raycaster.intersectObjects(clickableMeshes, true);
+    if (hits.length > 0) {
+        console.log(hits[0].object.name);
+    }
 });
-const earth= new THREE.Mesh(earthgeo,earthMat);
-sun.add(earth);
-earth.position.x=60;
 
-const pointLight = new THREE.PointLight(0xFFFFFF, 1000, 300);
+const div = document.createElement("div");
+div.textContent = 'Info / Controls';
+div.style.position = 'absolute';
+div.style.top = '250px';
+div.style.left = '12px';
+div.style.width = '220px';
+div.style.height = '120px';
+div.style.padding = '8px';
+div.style.backgroundColor = 'white';
+div.style.color = '#000';
+document.body.appendChild(div);
+
+const pointLight = new THREE.PointLight(0xFFFFFF, 10000, 3000);
 pointLight.position.set(25, 0, 0);
 scene.add(pointLight);
 
 function animate(){
     sun.rotateY(0.004);
-    mercuryobj.rotateY(0.004);
-    venus.rotateY(0.004);
-    earth.rotateY(0.004);
+    mercury.planet.rotateY(0.004);
+    venus.planet.rotateY(0.002);
+    earth.planet.rotateY(0.02);
+    mars.planet.rotateY(0.018);
+    jupiter.planet.rotateY(0.04);
+    
+    mercury.planetobj.rotateY(0.04);
+    venus.planetobj.rotateY(0.015);
+    earth.planetobj.rotateY(0.01);
+    mars.planetobj.rotateY(0.008);
+    jupiter.planetobj.rotateY(0.002);
     orbit.update();
+
     renderer.render(scene,camera);
 }
 
