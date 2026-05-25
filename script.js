@@ -1,18 +1,18 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 
-import starsTexture from '../three.j/img/stars.jpg';
-import sunTexture from '../three.j/img/sun.jpg' ;
-import mercuryTexture from '../three.j/img/mercury.jpg';
-import venusTexture from '../three.j/img/venus.jpg';
-import earthTexture from '../three.j/img/earth.jpg';
-import marsTexture from '../three.j/img/mars.jpg';
-import jupiterTexture from '../three.j/img/jupiter.jpg';
-import saturnTexture from '../three.j/img/saturn.jpg';
-import saturnRingTexture from '../three.j/img/saturn ring.png';
-import neptuneTexture from '../three.j/img/neptune.jpg';
-import uranusTexture from '../three.j/img/uranus.jpg';
-import uranusRingTexture from '../three.j/img/uranus ring.png';
+import starsTexture from './img/stars.jpg';
+import sunTexture from './img/sun.jpg' ;
+import mercuryTexture from './img/mercury.jpg';
+import venusTexture from './img/venus.jpg';
+import earthTexture from './img/earth.jpg';
+import marsTexture from './img/mars.jpg';
+import jupiterTexture from './img/jupiter.jpg';
+import saturnTexture from './img/saturn.jpg';
+import saturnRingTexture from './img/saturn ring.png';
+import neptuneTexture from './img/neptune.jpg';
+import uranusTexture from './img/uranus.jpg';
+import uranusRingTexture from './img/uranus ring.png';
 // import { PointerLockControls } from 'three/examples/jsm/Addons.js';
 //import { createElement } from 'react';
 
