@@ -8,7 +8,12 @@ import venusTexture from '../three.j/img/venus.jpg';
 import earthTexture from '../three.j/img/earth.jpg';
 import marsTexture from '../three.j/img/mars.jpg';
 import jupiterTexture from '../three.j/img/jupiter.jpg';
-import { PointerLockControls } from 'three/examples/jsm/Addons.js';
+import saturnTexture from '../three.j/img/saturn.jpg';
+import saturnRingTexture from '../three.j/img/saturn ring.png';
+import neptuneTexture from '../three.j/img/neptune.jpg';
+import uranusTexture from '../three.j/img/uranus.jpg';
+import uranusRingTexture from '../three.j/img/uranus ring.png';
+// import { PointerLockControls } from 'three/examples/jsm/Addons.js';
 //import { createElement } from 'react';
 
 const renderer= new THREE.WebGLRenderer();
@@ -52,7 +57,7 @@ const sunMat= new THREE.MeshBasicMaterial({
 const sun=new THREE.Mesh(sungeo,sunMat);
 scene.add(sun);
 sun.name = 'sun';
-function createplanet(radius, texture, dist, name){
+function createplanet(radius, texture, dist, name,ring){
     const geo = new THREE.SphereGeometry(radius,30,30);
     const mat = new THREE.MeshStandardMaterial({
         map: textureLoader.load(texture)
@@ -61,6 +66,20 @@ function createplanet(radius, texture, dist, name){
     if (name) planet.name = name;
     const planetobj = new THREE.Object3D();
     planetobj.add(planet);
+    if(ring){
+        const ringGeo=new THREE.RingGeometry(
+            ring.innerRadius,
+            ring.outerRadius,
+            32);
+        const ringMat=new THREE.MeshBasicMaterial({
+            map:textureLoader.load(ring.Texture),
+            side:THREE.DoubleSide,
+        });
+        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+        planet.add(ringMesh);
+        // ringMesh.position.x = position;
+        ringMesh.rotation.x=-0.5*Math.PI;
+    }
     scene.add(planetobj);
     planet.position.x = dist;
     return {planet,planetobj};
@@ -70,8 +89,29 @@ const venus =createplanet(5.8,venusTexture,42,'venus');
 const earth =createplanet(6,earthTexture,62,'earth');
 const mars =createplanet(4,marsTexture,78,'mars');
 const jupiter =createplanet(12,jupiterTexture,100,'jupiter');
+const saturn=createplanet(10,saturnTexture,138,'saturn',{
+    innerRadius: 10,
+    outerRadius: 20,
+    Texture: saturnRingTexture,
+});
+const uranus =createplanet(7,uranusTexture,176,'uranus',{
+    innerRadius:7,
+    outerRadius:12,
+    Texture: uranusRingTexture,
+});
+const neptune =createplanet(7,neptuneTexture,200,'neptune');
 
-const clickableMeshes = [sun, mercury.planet, venus.planet, earth.planet, mars.planet, jupiter.planet];
+const clickableMeshes = [
+    sun,
+    mercury.planet,
+    venus.planet,
+    earth.planet,
+    mars.planet,
+    jupiter.planet,
+    saturn.planet,
+    uranus.planet,
+    neptune.planet
+];
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
@@ -80,24 +120,12 @@ renderer.domElement.addEventListener('pointerdown', (event) => {
     pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
-    raycaster.style.cursor="pointer";
     const hits = raycaster.intersectObjects(clickableMeshes, true);
     if (hits.length > 0) {
         console.log(hits[0].object.name);
     }
 });
 
-const div = document.createElement("div");
-div.textContent = 'Info / Controls';
-div.style.position = 'absolute';
-div.style.top = '250px';
-div.style.left = '12px';
-div.style.width = '220px';
-div.style.height = '120px';
-div.style.padding = '8px';
-div.style.backgroundColor = 'white';
-div.style.color = '#000';
-document.body.appendChild(div);
 
 const pointLight = new THREE.PointLight(0xFFFFFF, 10000, 3000);
 pointLight.position.set(25, 0, 0);
@@ -110,17 +138,22 @@ function animate(){
     earth.planet.rotateY(0.02);
     mars.planet.rotateY(0.018);
     jupiter.planet.rotateY(0.04);
-    
+    saturn.planet.rotateY(0.038);
+    uranus.planet.rotateY(0.03);
+    neptune.planet.rotateY(0.032);
+
     mercury.planetobj.rotateY(0.04);
     venus.planetobj.rotateY(0.015);
     earth.planetobj.rotateY(0.01);
     mars.planetobj.rotateY(0.008);
     jupiter.planetobj.rotateY(0.002);
+    saturn.planetobj.rotateY(0.0009);
+    uranus.planetobj.rotateY(0.0004);
+    neptune.planetobj.rotateY(0.0001);
     orbit.update();
 
     renderer.render(scene,camera);
 }
-
 renderer.setAnimationLoop(animate);
 
 window.addEventListener('resize',()=>{
